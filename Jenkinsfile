@@ -25,7 +25,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     dir('spring-petclinic') {
-                        sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=CI-Spring-new'
+                        sh './mvnw clean verify sonar:sonar -Dsonar.login=admin -Dsonar.password=admin'
                     }
                 }
             }
