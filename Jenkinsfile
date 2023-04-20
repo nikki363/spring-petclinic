@@ -11,6 +11,7 @@ pipeline {
             steps {
                 dir('spring-petclinic') {
                     sh './mvnw clean package -DskipTests=true'
+                    sh 'cp -r target /usr/share/jenkins/ref/spring-petclinic'
                 }
             }
         }
@@ -21,19 +22,10 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube') {
+        stage('Run ansible playbook') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    dir('spring-petclinic') {
-                        sh './mvnw clean verify sonar:sonar -Dsonar.login=admin -Dsonar.password=admin'
-                    }
-                }
-            }
-        }
-        stage('Build petclinic.jar') {
-            steps {
-                dir('spring-petclinic/target') {
-                    sh 'java -Dserver.port=8888 -jar spring-petclinic-*.jar'
+                dir('/usr/share/jenkins/ref') {
+                    ansiblePlaybook becomeUser: 'niki', inventory: '/usr/share/jenkins/ref/inventory.ini', playbook: '/usr/share/jenkins/ref/deploy-petclinic.yml'
                 }
             }
         }
